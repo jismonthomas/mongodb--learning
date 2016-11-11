@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var PORT = process.env.PORT || 3000;
 
 var mongoose = require('./db/mongoose').mongoose;
+var ObjectID = require('mongodb').ObjectID;
 
 var {Todo} = require('./models/todo');
 
@@ -32,6 +33,22 @@ app.get('/todos',function(req, res){
 },
 function(err){
   res.status(400).send(err);
+});
+
+app.get('/todos/:id', function(req, res){
+   var id = req.params.id;
+  if (!ObjectID.isValid(id)) {
+    return console.log("id is not valid");
+  }
+  else {
+    console.log(id + " is a valid");
+  }
+  Todo.findById(id).then(function(result){
+    res.send(result);
+  },
+  function(err) {
+    console.log("error", err);
+  });
 });
 
 app.listen(PORT,function(){
