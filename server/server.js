@@ -24,6 +24,16 @@ app.post('/todos',function(req, res){
   });
 });
 
+
+app.get('/todos',function(req, res){
+  Todo.find().then(function(result){
+    res.send(result);
+  });
+},
+function(err){
+  res.status(400).send(err);
+});
+
 app.listen(PORT,function(){
   console.log('server started at port:' + PORT);
 });
