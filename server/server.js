@@ -7,7 +7,7 @@ var ObjectID = require('mongodb').ObjectID;
 
 var {Todo} = require('./models/todo');
 
-var {Users} = require('./models/users');
+var {User} = require('./models/user');
 
 var app = express();
 
@@ -51,38 +51,40 @@ app.get('/todos/:id', function(req, res){
   });
 });
 
+app.get('/todos/delete/:id',function(req, res) {
+  var id = req.params.id;
+   if (!ObjectID.isValid(id)) {
+     return res.status(404).send();
+   }
+   else {
+     res.send(id + " is a valid");
+   }
+   Todo.findByIdAndRemove(id).then(function(todo) {
+     res.send(todos);
+   },
+   function(err) {
+     res.status(404).send(err);
+ })
+},
+function(err) {
+  res.status(400).send(err);
+});
+
+app.post('/users', function(req, res) {
+  var user = new User({
+    email: req.body.email,
+    password: req.body.password
+  });
+
+  user.save().then(function() {
+    return user.generateAuthToken();
+  }).then(function(token){
+    res.header('x-auth', token).send(user);
+  },function(e) {
+  res.status(400).send(e);
+  })
+});
+
 app.listen(PORT,function(){
   console.log('server started at port:' + PORT);
 });
-
-// var newTodo = new Todo({
-//   text: 'cook dinner'
-// });
-
-// newTodo.save().then(function(doc){
-//   console.log('saved', doc);
-// },function(err){
-//   console.log("unable to save");
-// });
-
-// var otherTodo = new Todo({
-//   text: 'study hard',
-//   completedAt: 25
-// });
-//
-// otherTodo.save().then(function(result){
-//   console.log("saved :", result);
-// },
-// function(err){
-//   console.log("unable to save : ", err);
-// });
-
-// var userData = new Users({
-//   email: "jismonthomas@gmail.com"
-// });
-//
-// userData.save().then(function(result) {
-//   console.log("saved :", result);
-// }, function(err) {
-//   console.log("unable to save", err);
-// });
